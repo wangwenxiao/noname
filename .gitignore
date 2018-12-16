@@ -1,0 +1,5 @@
+*.pyc
+*.checkpoint
+*.vecs
+cifar-10-batches-py
+*.swp
