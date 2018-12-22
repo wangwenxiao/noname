@@ -19,6 +19,7 @@ classifier_arg = args.classifier
 feature_dim_arg = args.feature_dim
 debug_arg = args.debug
 stage_id_arg = args.stage_id
+tlabel_arg = args.target_label
 
 args = checkpoint['args']
 
@@ -27,7 +28,8 @@ args.lr = lr_arg
 args.momentum = momentum_arg
 args.classifier = classifier_arg
 args.feature_dim = feature_dim_arg
-stage_id_arg = args.stage_id
+args.stage_id = stage_id_arg
+args.target_label = tlabel_arg
 
 if args.model == 'resnet18':
     from model.resnet import resnet18
@@ -40,9 +42,12 @@ feature = feature.submodel(args.stage_id)
 feature.to(device)
 feature.eval()
 
+num_class = 10 if args.target_label != -1 else 2
+    
+
 if args.classifier == 'linear':
     from classifier.linear import Linear
-    model = Linear(args.feature_dim)
+    model = Linear(args.feature_dim, num_class)
 else:
     raise Exception("invalid classifier", classifier_arg)
 
@@ -71,6 +76,12 @@ while True:
     for i, batch in enumerate(trainloader, 0):
         x, y = batch
         x, y = x.to(device), y.to(device)
+
+        if args.target_label != -1:
+            bt = y == args.target_label
+            bf = y != args.target_label
+            y[bt] = 0
+            y[bf] = 1
         
         optimizer.zero_grad()
         fx = model(feature(x))
@@ -100,6 +111,11 @@ while True:
         for i, batch in enumerate(testloader, 0):
             x, y = batch
             x, y = x.to(device), y.to(device)
+            if args.target_label != -1:
+                bt = y == args.target_label
+                bf = y != args.target_label
+                y[bt] = 0
+                y[bf] = 1
             
             fx = model(feature(x))
             loss = F.cross_entropy(fx, y)
@@ -124,8 +140,8 @@ while True:
             'train_loss': train_loss,
             'train_acc': train_acc
         }
-    torch.save(checkpoint, './extracted/' + args.unique_id +'_'+ str(epoch) + '.checkpoint')
-    torch.save(checkpoint, './extracted/' + args.unique_id + '.checkpoint')
-    print ('checkpoint saved at ' + './extracted/' + args.unique_id +'_'+ str(epoch) + '.checkpoint')
+    torch.save(checkpoint, './extracted/' + args.unique_id +'_stage_id_' + str(args.stage_id) + '_target_'+ str(args.target_label)+'_'+ str(epoch) + '.checkpoint')
+    torch.save(checkpoint, './extracted/' + args.unique_id + '_stage_id_'+str(args.stage_id)+ '_target_'+ str(args.target_label)+'.checkpoint')
+    print ('checkpoint saved at ' + './extracted/' + args.unique_id +'_stage_id_' + str(args.stage_id) + '_target_'+ str(args.target_label)+'_'+ str(epoch) + '.checkpoint')
     if args.debug:
         break

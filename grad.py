@@ -48,7 +48,7 @@ grad on classifer's output(todo)
 
 args.debug = debug_arg
 
-var_vec = torch.tensor([])
+var_vec = torch.tensor([]).to(device)
 
 for i, batch in enumerate(testloader, 0):
     x, y = batch

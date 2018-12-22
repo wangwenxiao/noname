@@ -22,6 +22,7 @@ parser.add_argument('--debug', action='store_true')
 parser.add_argument('--classifier', type=str, default='linear')
 parser.add_argument('--stage_id', type=int, default=0)
 parser.add_argument('--feature_dim', type=int, default=4096)
+parser.add_argument('--target_label', type=int, default=-1)
 
 
 args = parser.parse_args()
