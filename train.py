@@ -10,7 +10,6 @@ from cifar10 import *
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 print (device)
-print ("haha")
 
 #label for cifar10
 classes = ('plane', 'car', 'bird', 'cat',
@@ -21,7 +20,7 @@ if args.model == 'resnet18':
     model = resnet18()
 else:
     raise Exception("invalid model", args.model)
-print ("haha2")
+
 model.to(device)
 
 optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum, weight_decay = args.weight_decay)
@@ -35,14 +34,13 @@ if args.load_trial:
     #optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
     epoch = checkpoint['epoch']
     args = checkpoint['args']
-print("haha3")
+
 def main():
     global epoch
     best_val_acc=0
     best_val_epoch=-1
     while True:
         epoch += 1
-        print("loop")
         cnt = 0
         train_loss = 0
         train_acc = 0
@@ -50,7 +48,7 @@ def main():
         scheduler.step()
         
         model.train()
-        print("train_complete")
+        
         for i, batch in enumerate(trainloader, 0):
             x, y = batch
             x, y = x.to(device), y.to(device)
