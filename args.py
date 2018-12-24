@@ -23,5 +23,9 @@ parser.add_argument('--classifier', type=str, default='linear')
 parser.add_argument('--stage_id', type=int, default=0)
 parser.add_argument('--feature_dim', type=int, default=4096)
 
+##svm
+parser.add_argument('--gamma',type=float, default=0.1)
+parser.add_argument('--max_iter',type=int, default=500)
+parser.add_argument('--C',type=float, default=0.6)
 
 args = parser.parse_args()
