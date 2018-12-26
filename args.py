@@ -19,13 +19,14 @@ parser.add_argument('--load_trial', action='store_true')
 parser.add_argument('--debug', action='store_true')
 
 #test arguments
-parser.add_argument('--classifier', type=str, default='linear')
+parser.add_argument('--classifier', type=str, default='svm')
 parser.add_argument('--stage_id', type=int, default=0)
 parser.add_argument('--feature_dim', type=int, default=4096)
+parser.add_argument('--target_label', type=int, default=1)
 
 ##svm
 parser.add_argument('--gamma',type=float, default=0.1)
-parser.add_argument('--max_iter',type=int, default=500)
+parser.add_argument('--max_iter',type=int, default=10)
 parser.add_argument('--C',type=float, default=0.6)
 
 args = parser.parse_args()

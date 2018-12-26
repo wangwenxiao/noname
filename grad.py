@@ -75,33 +75,37 @@ else:
     
  #   dic = unpickle('./data/test_batch')
  #   x,y = dic['data'],dic['labels']
-     x,y = testset
-   # x, y = x.to(device), y.to(device)
-   # x.requires_grad = True
+    x = torch.Tensor(testset.test_data)
+    x= x.permute(0, 3, 1, 2)
+    #X = X.type('torch.FloatTensor')
+    #print (X.shape)
+    y = torch.IntTensor(testset.test_labels)
+    x,y=x.to(device),y.to(device)
+    x.requires_grad = True
     
-   if args.target_label != -1:
-       bt = y == args.target_label
-       bf = y != args.target_label
-       y[bt] = 0
-       y[bf] = 1
-   loss=0
-   xnew = feature(x)
-   for i in range(xnew.shape[0]):
-      for j in range(model.m):
-          loss += 0.5*model.alpha[j]*model.Y[j]*model.kernel(xnew[i],model.X[j])
+    if args.target_label != -1:
+        bt = y == args.target_label
+        bf = y != args.target_label
+        y[bt] = 0
+        y[bf] = 1
+    loss=0
+    xnew = feature(x)
+    for i in range(xnew.shape[0]):
+        for j in range(model.m):
+            loss += model.alpha[j]*model.Y[j]*model.kernel(xnew[i],model.X[j])
     
-    loss.backward()
-    grad = x.grad.data
+     loss.backward()
+     grad = x.grad.data
     
-    #print (grad.shape)
-    var_vec = torch.cat((var_vec, grad), 0)
+     #print (grad.shape)
+     var_vec = torch.cat((var_vec, grad), 0)
     
-    if args.debug and i>10:
-        break
+     if args.debug and i>10:
+         break
     
-    var_vec = var_vec.permute(1,2,3,0)
+     var_vec = var_vec.permute(1,2,3,0)
 
-    print (var_vec.shape)
-    torch.save(var_vec, './result/' + args.unique_id + '.vecs')
-    print ('vectors saved at ' + './result/' + args.unique_id +'_'+ '.vecs')
-    exit(0)
+     print (var_vec.shape)
+     torch.save(var_vec, './result/' + args.unique_id + '.vecs')
+     print ('vectors saved at ' + './result/' + args.unique_id +'_'+ '.vecs')
+     exit(0)

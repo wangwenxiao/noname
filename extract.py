@@ -63,11 +63,16 @@ if args.classifier == 'linear':
     from classifier.linear import Linear
     model = Linear(args.feature_dim, num_class)
 else:
-    if args.classfier == 'svm':     #add
+    if args.classifier == 'svm':     #add
         kernel = RBF(gamma=args.gamma)
         #dic = unpickle('./data/data_batch_1')
         #X,y = dic['data'],dic['labels']
-        X,y = trainset
+        X = torch.Tensor(trainset.train_data)
+        X = X.permute(0, 3, 1, 2)
+        #X = X.type('torch.FloatTensor')
+        print (X.shape)
+        y = torch.IntTensor(trainset.train_labels)
+        print (y.shape)
         #for i in range(2,6):
         #    dic = unpickle('./data/data_batch_'+str(i))
         #    X1,y1 = dic['data'],dic['labels']
@@ -75,21 +80,36 @@ else:
         #    y = np.concatenate((y, y1), axis=0)
         
         #X,y=trainset
-        # X,y=X.to(device),y.to(device)
+        X,y=X.to(device),y.to(device)
+        print (X.shape)
         X_train=feature(X)
+        
         if args.target_label != -1:
             bt = y == args.target_label
             bf = y != args.target_label
             y[bt] = 1
             y[bf] = -1
         y_train=y
+        
+        print ('stop')
         model = SVM(X_train,y_train,max_iter=args.max_iter, kernel=kernel, C=args.C)
+        
+        print ('stop2')
+        
         model.train()
         
+        print ('stop3')
  #       dic = unpickle('./data/test_batch')
  #       X,y = dic['data'],dic['labels']
-        X,y = testset
-        X_test=np.array(feature(X))
+        #X,y = testset.test_data,testset.test_labels
+        X = torch.Tensor(testset.test_data)
+        X = X.permute(0, 3, 1, 2)
+        #X = X.type('torch.FloatTensor')
+        #print (X.shape)
+        y = torch.IntTensor(testset.test_labels)
+        X,y=X.to(device),y.to(device)
+        #print (y.shape)
+        X_test=feature(X)
         if args.target_label != -1:
             bt = y == args.target_label
             bf = y != args.target_label
