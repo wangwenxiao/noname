@@ -69,7 +69,8 @@ class SVM():
         self.Y = trainY.type('torch.FloatTensor')
         self.m = trainX.shape[0]
         self.n = trainX.shape[1]
-        self.K = torch.zeros((self.m)) #核的新特征数组初始化
+        self.K = torch.zeros((self.m))
+        self.k_v = torch.zeros((self.m)) #核的新特征数组初始化
        # self.Ki = torch.zeros((self.m))
         #self.bar = progressbar.ProgressBar(widgets=bar_widgets)  # 进度条
 
@@ -165,12 +166,12 @@ class SVM():
    
         print ("1.1.1")
         
-        k_v = torch.zeros((self.m)) 
+        self.k_v = torch.zeros((self.m)) 
         
         print ("1.1.2")
         
         for i in range(self.m):
-            k_v[i] = self.kernel(self.X[i],X)
+            self.k_v[i] = self.kernel(self.X[i],X)
             
         print ("1.1.3")
         
@@ -180,7 +181,7 @@ class SVM():
         
     #    print (self.Y.shape)
 
-        return torch.dot(self.alpha * self.Y, k_v) + self.b
+        return torch.dot(self.alpha * self.Y, self.k_v) + self.b
 
     #预测，返回一个判断正确的index的矩阵
     def predict(self, X):
