@@ -2,8 +2,8 @@ import torch
 import argparse
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--src1', type=str, default='Dec20_01_stage_id_2_target_9')
-parser.add_argument('--src2', type=str, default='Dec20_03_stage_id_2_target_9')
+parser.add_argument('--src1', type=str, default='Dec20_01_stage_id_2_target_2')
+parser.add_argument('--src2', type=str, default='Dec20_03_stage_id_2_target_2')
 parser.add_argument('--metric', type=str, default='L2')
 parser.add_argument('--crop_len', type=int, default=0)
 parser.add_argument('--metric_arg', type=str, default='0')

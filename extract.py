@@ -71,6 +71,7 @@ while True:
     cnt = 0
     train_loss = 0
     train_acc = 0
+    t2t = 0
     
     model.train()
     for i, batch in enumerate(trainloader, 0):
@@ -85,16 +86,18 @@ while True:
         
         optimizer.zero_grad()
         fx = model(feature(x))
+        print (fx.shape)
         loss = F.cross_entropy(fx, y)
         loss.backward()
         optimizer.step()
 
         train_loss += loss.item()
         train_acc += float((torch.max(fx.data, 1)[1] == y).sum().item()) / y.size(0)
+        t2t += float(((torch.max(fx.data, 1)[1] == y)*(y==0)).sum().item())*10 / y.size(0)
         cnt += 1
         if (i+1) % args.period == 0:
-            print ("[train] [epoch: %d] [batches: %5d] [loss: %.3f] [acc: %.3f]"%
-                (epoch, i+1, train_loss / cnt, train_acc / cnt))
+            print ("[train] [epoch: %d] [batches: %5d] [loss: %.3f] [acc: %.3f] [t2f: %.3f]"%
+	                (epoch, i+1, train_loss / cnt, train_acc / cnt, 1.0 - t2t / cnt))
             
             if args.debug:
                 break
@@ -105,6 +108,7 @@ while True:
     cnt = 0
     valid_loss = 0
     valid_acc = 0
+    t2t = 0
 
     model.eval()
     with torch.no_grad():
@@ -122,10 +126,11 @@ while True:
 
             valid_loss += loss.item()
             valid_acc += float((torch.max(fx.data, 1)[1] == y).sum().item()) / y.size(0)
+            t2t += float(((torch.max(fx.data, 1)[1] == y)*(y==0)).sum().item())*10 / y.size(0)
             cnt += 1
             if (i+1) % args.period == 0:
-                print ("[valid] [epoch: %d] [batches: %5d] [loss: %.3f] [acc: %.3f]"%
-                    (epoch, i+1, valid_loss / cnt, valid_acc / cnt))
+                print ("[valid] [epoch: %d] [batches: %5d] [loss: %.3f] [acc: %.3f] [t2f: %.3f]"%
+	                    (epoch, i+1, valid_loss / cnt, valid_acc / cnt, 1.0 - t2t / cnt))
                 
                 if args.debug:
                     break
