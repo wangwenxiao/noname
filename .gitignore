@@ -4,3 +4,5 @@
 cifar-10-batches-py
 *.swp
 *.tar.gz
+*.jpg
+
