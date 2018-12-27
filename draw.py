@@ -7,13 +7,14 @@ import pickle
 import numpy as np
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--src1', type=str, default='Dec20_01_stage_id_2_target_2')
-parser.add_argument('--src2', type=str, default='Dec20_01_stage_id_3_target_2')
+parser.add_argument('--src1', type=str, default='Dec20_01_stage_id_1_target_7')
+parser.add_argument('--src2', type=str, default='Dec20_01_stage_id_3_target_7')
 parser.add_argument('--img_index', type=int, default=0)
 parser.add_argument('--crop_len', type=int, default=0)
 parser.add_argument('--mix', type=float, default=0.25)
 parser.add_argument('--blurK', type=int, default=1)
 parser.add_argument('--save', action='store_true')
+parser.add_argument('--rescale', type=float, default=0)
 output_size = (256, 256)
 args = parser.parse_args()
 
@@ -55,14 +56,19 @@ def getMap(r): #h*w*c
     r = r / np.abs(r).max()
     return r
 
+def Rescale(r):
+    if args.rescale != 0:
+        r = r * (np.abs(r)**args.rescale)
+        return r / np.abs(r).max()
+    return r
 
 r1 = LoadVecs(args.src1)
 r2 = LoadVecs(args.src2)
 print (r1.shape)
 
 map1 = getMap(r1[args.img_index].permute(1, 2, 0))
-img1 = Map2Img(map1)
-map2 = getMap(r2[args.img_index].permute(1, 2, 0))
+img1 = Map2Img(Rescale(map1))
+map2 = getMap(Rescale(r2[args.img_index].permute(1, 2, 0)))
 img2 = Map2Img(map2)
 
 testset = LoadData()
