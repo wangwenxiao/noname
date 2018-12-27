@@ -70,6 +70,8 @@ class SVM():
         self.m = trainX.shape[0]
         self.n = trainX.shape[1]
         self.K = torch.zeros((self.m))
+        self.boo = torch.zeros((self.m),dtype=torch.int)
+        self.error = torch.zeros((self.m))
         self.k_v = torch.zeros((self.m)) #核的新特征数组初始化
        # self.Ki = torch.zeros((self.m))
         #self.bar = progressbar.ProgressBar(widgets=bar_widgets)  # 进度条
@@ -85,6 +87,8 @@ class SVM():
 
     def train(self):
 
+   #     sum_iter = 0
+        
         for now_iter in range(self.max_iter):
             
             print (now_iter)
@@ -95,15 +99,20 @@ class SVM():
                 print ('1 ',j)
                 
                 #选择第二个优化的拉格朗日乘子
-                i = self.random_index(j)
+                
                 
                 print ('1.1')
                 
-                error_i = self.error_row(i)
+                #print (self.boo[j])
                 
-                print ('1.2')
+               #print (torch.IntTensor((0)))
                 
-                error_j = self.error_row(j)
+                if (torch.equal(self.boo[j],torch.tensor(0,dtype=torch.int))):
+                    error_j = self.error_row(j)
+                    self.error[j] = error_j
+                    self.boo[j] = torch.tensor(1,dtype=torch.int)
+                else:
+                    error_j = self.error[j]
                 
                 print('2 ',j)
 
@@ -111,6 +120,17 @@ class SVM():
                 if (self.Y[j] * error_j < -0.001 and self.alpha[j] < self.C) or (self.Y[j] * error_j > 0.001 and self.alpha[j] > 0):
 
                     print ('3 ',j)
+                    
+                    i = self.random_index(j)
+                    
+                    if (torch.equal(self.boo[i],torch.tensor(0,dtype=torch.int))):
+                        error_i = self.error_row(i)
+                        self.error[i] = error_i
+                        self.boo[i] = torch.tensor(1,dtype=torch.int)
+                    else:
+                        error_i = self.error[i]
+                        
+                    print ('4 ',j)
                     
                     Kij = self.kernel(self.X[i],self.X[j])
                     
@@ -122,6 +142,12 @@ class SVM():
                         continue
                     
                     print ('4 ',j)
+                    
+               #     sumiter += 1
+                    
+               #     if (sumiter > self.max_iter)
+                    
+                    self.boo = torch.zeros((self.m),dtype=torch.int)
 
                     L, H = self.getBounds(i, j)
                     old_alpha_j, old_alpha_i = self.alpha[j], self.alpha[i]  #旧的拉格朗日乘子的值
@@ -171,7 +197,23 @@ class SVM():
         print ("1.1.2")
         
         for i in range(self.m):
-            self.k_v[i] = self.kernel(self.X[i],X)
+         #   self.k_v[i] = self.kernel(self.X[i],X)
+             try:
+                 print('234')
+                 expin = -self.kernel.gamma * torch.dist(self.X[i], X) ** 2
+                 print('233')
+                 queq = torch.exp(expin)
+                 print('235')
+                 self.k_v[i] = queq
+                 print('236')
+                 #expin = 
+                 #self.k_v[i] = torch.exp(-self.kernel.gamma * torch.dist(self.X[i], X) ** 2)
+             except BaseException as e:
+                 import traceback
+                 print(e)
+                 traceback.print_exc()
+                 raise(e)
+                 
             
         print ("1.1.3")
         
