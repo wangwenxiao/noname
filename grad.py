@@ -17,8 +17,10 @@ checkpoint = torch.load('./extracted/' + args.unique_id+'.checkpoint')
 
 uid_arg = args.unique_id
 debug_arg = args.debug
+num_data_arg = args.num_data
 args = checkpoint['args']
 args.debug = debug_arg
+
 
 num_class = 10 if args.target_label != -1 else 2
 
@@ -29,7 +31,7 @@ if args.classifier == 'linear':
     model.to(device)
     model.eval()
 else:
-    if args.classfier == 'svm':
+    if args.classifier == 'svm':
         model = checkpoint['model']
     else: 
         raise Exception("invalid classifier", classifier_arg)
@@ -55,11 +57,14 @@ if args.model == 'resnet18':
 else:
     raise Exception("invalid model", args.model)
 
+print ('stop')
+
 feature.load_state_dict(checkpoint['model_state_dict'])
 feature = feature.submodel(args.stage_id)
 feature.to(device)
 feature.eval()
 
+print ('stop1')
 
 """
 grad on loss function(done)
@@ -80,6 +85,9 @@ else:
     #X = X.type('torch.FloatTensor')
     #print (X.shape)
     y = torch.IntTensor(testset.test_labels)
+    if (num_data_arg<x.shape[0]):
+        x = x[:num_data_arg]
+        y = y[:num_data_arg]
     x,y=x.to(device),y.to(device)
     x.requires_grad = True
     
@@ -89,23 +97,29 @@ else:
         y[bt] = 0
         y[bf] = 1
     loss=0
+    
+    print ('stop2')
     xnew = feature(x)
+    
+    print ('stop3')
     for i in range(xnew.shape[0]):
         for j in range(model.m):
             loss += model.alpha[j]*model.Y[j]*model.kernel(xnew[i],model.X[j])
     
-     loss.backward()
-     grad = x.grad.data
+    print ('stop4')
+    loss.backward()
+    grad = x.grad.data
+    print ('stop5')
     
-     #print (grad.shape)
-     var_vec = torch.cat((var_vec, grad), 0)
+    #print (grad.shape)
+    var_vec = torch.cat((var_vec, grad), 0)
     
-     if args.debug and i>10:
-         break
+    #if args.debug and i>10:
+    #    break
     
-     var_vec = var_vec.permute(1,2,3,0)
+    var_vec = var_vec.permute(1,2,3,0)
 
-     print (var_vec.shape)
-     torch.save(var_vec, './result/' + args.unique_id + '.vecs')
-     print ('vectors saved at ' + './result/' + args.unique_id +'_'+ '.vecs')
-     exit(0)
+    print (var_vec.shape)
+    torch.save(var_vec, './result/' + args.unique_id + '.vecs')
+    print ('vectors saved at ' + './result/' + args.unique_id +'_'+ '.vecs')
+    exit(0)

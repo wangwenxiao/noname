@@ -31,6 +31,7 @@ tlabel_arg = args.target_label
 gamma_arg = args.gamma
 max_iter_arg = args.max_iter
 C_arg = args.C
+num_data_arg = args.num_data
 
 args = checkpoint['args']
 
@@ -44,6 +45,7 @@ args.target_label = tlabel_arg
 args.gamma = gamma_arg
 args.max_iter = max_iter_arg
 args.C = C_arg
+args.num_data = num_data_arg
 
 if args.model == 'resnet18':
     from model.resnet import resnet18
@@ -80,6 +82,10 @@ else:
         #    y = np.concatenate((y, y1), axis=0)
         
         #X,y=trainset
+        if (args.num_data<X.shape[0]):
+            X=X[:args.num_data]
+            y=y[:args.num_data]
+        print (y)
         X,y=X.to(device),y.to(device)
         print (X.shape)
         X_train=feature(X)
@@ -107,7 +113,13 @@ else:
         #X = X.type('torch.FloatTensor')
         #print (X.shape)
         y = torch.IntTensor(testset.test_labels)
+        if (args.num_data<X.shape[0]):
+            X= X[:args.num_data]
+            y= y[:args.num_data]
         X,y=X.to(device),y.to(device)
+        
+        print (y)
+        
         #print (y.shape)
         X_test=feature(X)
         if args.target_label != -1:
@@ -117,6 +129,9 @@ else:
             y[bf] = -1
         y_test=y
         predictions = model.predict(X_test)
+        
+        print ('stop4')
+        
         accuracyRate = accuracy(y_test, predictions)
         print('Classification accuracy (%s): %s'
           % (kernel, accuracyRate))
@@ -129,9 +144,9 @@ else:
           #  'train_loss': train_loss,
           #  'train_acc': train_acc
         }
-        torch.save(checkpoint, './extracted/' + args.unique_id +'_stage_id_' + str(args.stage_id) + '_target_'+ str(args.target_label)+'_'+ str(epoch) + '.checkpoint')
-        torch.save(checkpoint, './extracted/' + args.unique_id + '_stage_id_'+str(args.stage_id)+ '_target_'+ str(args.target_label)+'.checkpoint')
-        print ('checkpoint saved at ' + './extracted/' + args.unique_id +'_stage_id_' + str(args.stage_id) + '_target_'+ str(args.target_label)+'_'+ str(epoch) + '.checkpoint')
+        torch.save(checkpoint, './extracted/' + args.unique_id +'_stage_id_' + str(args.stage_id) + '_target_'+ str(args.target_label)+ '.checkpoint')
+       # torch.save(checkpoint, './extracted/' + args.unique_id + '_stage_id_'+str(args.stage_id)+ '_target_'+ str(args.target_label)+'.checkpoint')
+        print ('checkpoint saved at ' + './extracted/' + args.unique_id +'_stage_id_' + str(args.stage_id) + '_target_'+ str(args.target_label) + '.checkpoint')
  #       if args.debug:
  #           break
         exit(0)

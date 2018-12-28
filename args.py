@@ -28,5 +28,6 @@ parser.add_argument('--target_label', type=int, default=1)
 parser.add_argument('--gamma',type=float, default=0.1)
 parser.add_argument('--max_iter',type=int, default=10)
 parser.add_argument('--C',type=float, default=0.6)
+parser.add_argument('--num_data',type=int,default=500)
 
 args = parser.parse_args()

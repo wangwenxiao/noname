@@ -96,12 +96,12 @@ class SVM():
             alpha_prev = self.alpha.clone()
             for j in range(self.m):
 
-                print ('1 ',j)
+          #      print ('1 ',j)
                 
                 #选择第二个优化的拉格朗日乘子
                 
                 
-                print ('1.1')
+        #        print ('1.1')
                 
                 #print (self.boo[j])
                 
@@ -114,12 +114,12 @@ class SVM():
                 else:
                     error_j = self.error[j]
                 
-                print('2 ',j)
+        #       print('2 ',j)
 
                 #检验他们是否满足KKT条件，然后选择违反KKT条件最严重的self.alpha[j]
                 if (self.Y[j] * error_j < -0.001 and self.alpha[j] < self.C) or (self.Y[j] * error_j > 0.001 and self.alpha[j] > 0):
 
-                    print ('3 ',j)
+          #          print ('3 ',j)
                     
                     i = self.random_index(j)
                     
@@ -130,7 +130,7 @@ class SVM():
                     else:
                         error_i = self.error[i]
                         
-                    print ('4 ',j)
+           #         print ('4 ',j)
                     
                     Kij = self.kernel(self.X[i],self.X[j])
                     
@@ -141,7 +141,7 @@ class SVM():
                     if eta >= 0:
                         continue
                     
-                    print ('4 ',j)
+             #       print ('4 ',j)
                     
                #     sumiter += 1
                     
@@ -190,22 +190,22 @@ class SVM():
         
    #     print (self.X.shape)
    
-        print ("1.1.1")
+    #    print ("1.1.1")
         
         self.k_v = torch.zeros((self.m)) 
         
-        print ("1.1.2")
+    #    print ("1.1.2")
         
         for i in range(self.m):
          #   self.k_v[i] = self.kernel(self.X[i],X)
              try:
-                 print('234')
+       #          print('234')
                  expin = -self.kernel.gamma * torch.dist(self.X[i], X) ** 2
-                 print('233')
+       #          print('233')
                  queq = torch.exp(expin)
-                 print('235')
+       #          print('235')
                  self.k_v[i] = queq
-                 print('236')
+       #          print('236')
                  #expin = 
                  #self.k_v[i] = torch.exp(-self.kernel.gamma * torch.dist(self.X[i], X) ** 2)
              except BaseException as e:
@@ -215,7 +215,7 @@ class SVM():
                  raise(e)
                  
             
-        print ("1.1.3")
+    #    print ("1.1.3")
         
     #    k_v = self.kernel(self.X, X)
         
@@ -232,9 +232,9 @@ class SVM():
         for i in range(n):
             temp = self.predict_row(X[i, :])
             if (temp>0):
-                result[i]=1
+                result[i]=torch.tensor(1.0)
             else:
-                result[i]=-1
+                result[i]=torch.tensor(-1.0)
            # result[i] = np.sign()) #正的返回1，负的返回-1
         return result
 
@@ -267,7 +267,13 @@ class SVM():
 
 #返回准确率
 def accuracy(actual, predicted):
-    return 1.0 - sum(actual != predicted) / float(actual.shape[0])
+    acc = torch.tensor(0.0)
+    actual2 = actual.type('torch.FloatTensor')
+    for i in range(actual2.shape[0]):
+        if (torch.equal(actual2[i],predicted[i])):
+            acc = acc +1.0
+    return acc/float(actual.shape[0])
+    #return 1.0 - sum(actual.type('torch.FloatTensor') != predicted) / float(actual.shape[0])
 
 
 
