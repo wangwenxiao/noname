@@ -42,7 +42,7 @@ feature = feature.submodel(args.stage_id)
 feature.to(device)
 feature.eval()
 
-num_class = 10 if args.target_label == -1 else 2
+num_class = 10 if args.target_label == 10 else 2
     
 
 if args.classifier == 'linear':
@@ -78,7 +78,7 @@ while True:
         x, y = batch
         x, y = x.to(device), y.to(device)
 
-        if args.target_label != -1:
+        if args.target_label != 10:
             bt = y == args.target_label
             bf = y != args.target_label
             y[bt] = 0
@@ -86,6 +86,7 @@ while True:
         
         optimizer.zero_grad()
         fx = model(feature(x))
+        #print (fx.shape)
         loss = F.cross_entropy(fx, y)
         loss.backward()
         optimizer.step()
@@ -96,7 +97,7 @@ while True:
         cnt += 1
         if (i+1) % args.period == 0:
             print ("[train] [epoch: %d] [batches: %5d] [loss: %.3f] [acc: %.3f] [t2f: %.3f]"%
-                (epoch, i+1, train_loss / cnt, train_acc / cnt, 1.0 - t2t / cnt))
+	                (epoch, i+1, train_loss / cnt, train_acc / cnt, 1.0 - t2t / cnt))
             
             if args.debug:
                 break
@@ -107,14 +108,14 @@ while True:
     cnt = 0
     valid_loss = 0
     valid_acc = 0
-    t2t=0
+    t2t = 0
 
     model.eval()
     with torch.no_grad():
         for i, batch in enumerate(testloader, 0):
             x, y = batch
             x, y = x.to(device), y.to(device)
-            if args.target_label != -1:
+            if args.target_label != 10:
                 bt = y == args.target_label
                 bf = y != args.target_label
                 y[bt] = 0
@@ -129,7 +130,7 @@ while True:
             cnt += 1
             if (i+1) % args.period == 0:
                 print ("[valid] [epoch: %d] [batches: %5d] [loss: %.3f] [acc: %.3f] [t2f: %.3f]"%
-                    (epoch, i+1, valid_loss / cnt, valid_acc / cnt, 1.0 - t2t / cnt))
+	                    (epoch, i+1, valid_loss / cnt, valid_acc / cnt, 1.0 - t2t / cnt))
                 
                 if args.debug:
                     break

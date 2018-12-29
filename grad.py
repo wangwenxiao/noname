@@ -18,7 +18,7 @@ debug_arg = args.debug
 args = checkpoint['args']
 args.debug = debug_arg
 
-num_class = 10 if args.target_label == -1 else 2
+num_class = 10 if args.target_label == 10 else 2
 
 if args.classifier == 'linear':
     from classifier.linear import Linear
@@ -70,7 +70,7 @@ for i, batch in enumerate(testloader, 0):
     x.requires_grad = True
     
     fx = model(feature(x))
-    if args.target_label == -1:
+    if args.target_label == 10:
         loss = F.cross_entropy(fx, y)
     else:
         loss = fx[:,0].sum()
