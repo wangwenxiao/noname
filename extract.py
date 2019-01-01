@@ -69,12 +69,18 @@ else:
         kernel = RBF(gamma=args.gamma)
         #dic = unpickle('./data/data_batch_1')
         #X,y = dic['data'],dic['labels']
-        X = torch.Tensor(trainset.train_data)
-        X = X.permute(0, 3, 1, 2)
+        trainloader = torch.utils.data.DataLoader(trainset, batch_size=args.num_data,
+                                          shuffle=True, num_workers=args.num_workers)
+        for i, batch in enumerate(trainloader, 0):
+            X,y=batch
+            break
+        #X = torch.Tensor(trainset.train_data)
+        #X = X.permute(0, 3, 1, 2)
         #X = X.type('torch.FloatTensor')
-        print (X.shape)
-        y = torch.IntTensor(trainset.train_labels)
-        print (y.shape)
+        #print (X.shape)
+        #y = torch.IntTensor(trainset.train_labels)
+        #print (y.shape)
+        #X,y=trainloader[0]
         #for i in range(2,6):
         #    dic = unpickle('./data/data_batch_'+str(i))
         #    X1,y1 = dic['data'],dic['labels']
@@ -82,13 +88,23 @@ else:
         #    y = np.concatenate((y, y1), axis=0)
         
         #X,y=trainset
-        if (args.num_data<X.shape[0]):
-            X=X[:args.num_data]
-            y=y[:args.num_data]
-        print (y)
+#        if (args.num_data<X.shape[0]):
+#            X=X[:args.num_data]
+#            y=y[:args.num_data]
+        #print (y)
         X,y=X.to(device),y.to(device)
+        print(X[0])
         print (X.shape)
         X_train=feature(X)
+        X_train=X_train.view((X_train.shape[0],-1))
+        print (X_train.shape)
+        mean=X_train.mean()
+        std=X_train.max()
+        X_train=(X_train-mean)/std
+        #pr
+        #mean_train=
+        print ('ogg')
+        print (X_train[0])
         
         if args.target_label != -1:
             bt = y == args.target_label
@@ -108,20 +124,30 @@ else:
  #       dic = unpickle('./data/test_batch')
  #       X,y = dic['data'],dic['labels']
         #X,y = testset.test_data,testset.test_labels
-        X = torch.Tensor(testset.test_data)
-        X = X.permute(0, 3, 1, 2)
+        testloader = torch.utils.data.DataLoader(testset, batch_size=args.num_data,
+                                         shuffle=False, num_workers=args.num_workers)
+       # X = torch.Tensor(testset.test_data)
+        #X = X.permute(0, 3, 1, 2)
         #X = X.type('torch.FloatTensor')
         #print (X.shape)
-        y = torch.IntTensor(testset.test_labels)
-        if (args.num_data<X.shape[0]):
-            X= X[:args.num_data]
-            y= y[:args.num_data]
+#        y = torch.IntTensor(testset.test_labels)
+#        if (args.num_data<X.shape[0]):
+#            X= X[:args.num_data]
+#            y= y[:args.num_data]
+        for i, batch in enumerate(testloader, 0):
+            X,y=batch
+            break
+        #X,y=testloader[0]
         X,y=X.to(device),y.to(device)
         
         print (y)
         
         #print (y.shape)
         X_test=feature(X)
+        X_test=X_test.view((X_test.shape[0],-1))
+        mean=X_test.mean()
+        std=X_test.max()
+        X_test=(X_test-mean)/std
         if args.target_label != -1:
             bt = y == args.target_label
             bf = y != args.target_label
